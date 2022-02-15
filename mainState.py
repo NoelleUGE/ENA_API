@@ -14,7 +14,7 @@ import pandas
 import requests
 
 import api_pb2
-
+from recup_token import fct_recup_token
 
 ### INSTRUVTIONS FOR THE BEGINING #########################################################"
 # download protobuf compiler named protoc in the internet, then put the file "protoc.exe"
@@ -33,19 +33,7 @@ import api_pb2
 # libprotoc 3.17.3
 ######################################################################"
 
-def func_main_list_vehicle():
-    ##1°###### Get the token with post request #################
-
-    url_token = 'https://lapin.stg.navya.cloud/auth/token'
-    # url_token = 'https://lapin-preprod.navya.cloud/auth/token'
-    params = {'username': 'projet-ena-api@univ-eiffel.fr', 'password': 'c9Vt7Ejg4ZMHHH3!'}
-
-    token = requests.post(url_token, data=params)
-    token24h = token.text
-    print(token24h)
-
-    vehicle_list = api_pb2._VEHICLESTATEMESSAGE
-
+def func_main_list_vehicle(token24h):
     ##2°###### send and receive with get method ###############
 
     # api-endpoint
@@ -190,7 +178,11 @@ def func_main_list_vehicle():
                      indoorTemperature, outdoorTemperature, switchManual, batteryLevel, batteryState, instConsumption,
                      doorsState, vehicle_mode, robot_mode, driving_direction]
 
-    return df
+        tt = datetime.datetime.now().date()
+        repertoire_du_jour = os.path.join(r'C:\Users\ENA\Desktop\API_donnees_collectees', str(tt))
+        os.chdir(repertoire_du_jour)
+        with open('resultatsDF.csv', 'a') as f:  # mode a for append
+            df.to_csv(f, header=f.tell() == 0)
 
     pass
 
@@ -206,7 +198,8 @@ def ecrit_dans_csv(nom_doc, valeurs):
 if __name__ == '__main__':
     # Script2.py executed as script
     # do something
-    df = func_main_list_vehicle()
+    token24h = fct_recup_token()
+    df = func_main_list_vehicle(token24h)
     ecrit_dans_csv('resultatsDF.csv', df)
 
 """ NOT USE """
